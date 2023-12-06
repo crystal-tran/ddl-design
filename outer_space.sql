@@ -1,6 +1,6 @@
 CREATE TABLE moons (
-    moon character varying(50) NOT NULL,
-    planet_id character varying(50) REFERENCES planets
+    name character varying(50) NOT NULL PRIMARY KEY,
+    planet_name character varying(50) REFERENCES planets
 );
 
 
@@ -9,10 +9,9 @@ CREATE TABLE moons (
 --
 
 CREATE TABLE planets (
-    planet character varying(50) NOT NULL,
+    name character varying(50) NOT NULL PRIMARY KEY,
     oribtal_period_in_years numeric NOT NULL,
-    star_id character varying(50) NOT NULL,
-    moon_id character varying(50)
+    star_name character varying(50) NOT NULL
 );
 
 --
@@ -20,31 +19,40 @@ CREATE TABLE planets (
 --
 
 CREATE TABLE stars (
-    star character varying(50) NOT NULL,
+    name character varying(50) NOT NULL PRIMARY KEY,
     temp_in_kelvin double precision NOT NULL
 );
 
-INSERT INTO planets (planet,oribtal_period_in_years,star_id,moon_id)
+INSERT INTO planets (name,oribtal_period_in_years,star_name)
     VALUES
-        ('earth', 1,'sun', 'moon'),
-        ('jupiter', 4, 'sun', 'europa');
+        ('Earth', 1.00 ,'The Sun'),
+        ('Mars', 1.882, 'The Sun'),
+        ('Venus', 0.62, 'The Sun'),
+        ('Proxima Centauri b', 0.03, 'Proxima Centauri'),
+        ('Gliese 876 b', 0.236, 'Gliese 876');
 
-INSERT INTO moons (moon)
+INSERT INTO moons (name, planet_name)
     VALUES
-        ('moon'),
-        ('europa'),
-        ('io');
+        ('The Moon', 'Earth'),
+        ('Phobos', 'Mars'),
+        ('Deimos', 'Mars');
 
-INSERT INTO stars (star,temp_in_kelvin)
+INSERT INTO stars (name, temp_in_kelvin)
     VALUES
-        ('sun',5800);
+        ('The Sun',5800),
+        ('Proxima Centauri', 3042),
+        ('Gliese 876', 3192);
 
 SELECT
-    planets.planet,
-    stars.star,
-    count(*)
+    planets.name,
+    stars.name,
+    moons.name,
+    count(moons.name) AS moon_count
 
-    FROM stars
-        JOIN planets ON stars.star = planets.star_id
-        JOIN moons ON planets.moon_id = moons.moon
-        GROUP BY planets.planet, stars.star;
+    FROM planets
+        LEFT JOIN stars ON stars.name = planets.star_name
+        LEFT JOIN moons ON moons.planet_name = planets.name
+    GROUP BY stars.name, planets.name
+    ORDER BY planets.name;
+
+
